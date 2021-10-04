@@ -1,6 +1,9 @@
 const fs = require('fs')
 const { promises: fsPromises } = require('fs')
 
+
+/* Para melhor uso desse arquivo, comente e descomente as funções que deseja utilizar */
+
 /* A biblioteca File System é relativamente simples, o principal problema que podemos ter quando usamos elas são as promises e tipos de dados.
  * Por isso, vou fazer um briefing delas.Rode o comando  'node fileSystem.js' no terminal para entender melhor e brincar 
  * com o código.
@@ -99,10 +102,10 @@ const callbackFileSystem = async () => {
   /* CRIANDO ARQUIVOS E ESCREVENDO NELES */
 
   /* Existem diferentes manieras de se criar um arquivo com FS, mas vou usar uma que me acostumei  */ 
-    // fs.writeFile(`Umarquivo!.txt`, '', (err) => {
-    //   if(err) throw err
-    //   console.log('O arquivo foi criando quando a callback for chamada')
-    // })
+    fs.writeFile(`Umarquivo!.txt`, '', (err) => {
+      if(err) throw err
+      console.log('O arquivo foi criando quando a callback for chamada')
+    })
 
   /* A função writeFile, como o nome sugere, escreve em um arquivo, porém se o arquivo não existe ele é, então, criado.
    * Essa função recebe trẽs parâmetros, o primeiro é o nome do arquivo, ou rota para sua criação. (recomendo utilizar a lib Path, mas não entrarei nesse critério)
@@ -121,17 +124,17 @@ const callbackFileSystem = async () => {
    * Você quer criar um arquivo, e logo em sequencia escrever algo dentro dele. Algo como:
    */
 
-  // await fs.writeFile('Um arquivo!.txt', '', (err) => {if(err) throw err})
-  // const textFromDatabase = 'Algum dado que venha do banco de dados'
-  // fs.appendFile('UmArquivo!.txt', textFromDatabase, (err) => {if(err) throw err})
+  await fs.writeFile('Um arquivo!.txt', '', (err) => {if(err) throw err})
+  const textFromDatabase = 'Algum dado que venha do banco de dados'
+  fs.appendFile('UmArquivo!.txt', textFromDatabase, (err) => {if(err) throw err})
 
   /* Isso não vai dar certo. Isso por que o arquivo é criado apenas quando a função de callback é retornada. A forma correta de usar essa função seria: */
 
-  // fs.writeFile('src/Umarquivo!.txt', 'ESCREVI ALGO', (err) => {
-  //   if(err) throw err
-  //   const textFromDatabase = 'Algum dado que venha do banco de dados'
-  //   fs.writeFile('Umarquivo!.txt', textFromDatabase, (err) => {if(err) throw err})
-  // })
+  fs.writeFile('src/Umarquivo!.txt', 'ESCREVI ALGO', (err) => {
+    if(err) throw err
+    const textFromDatabase = 'Algum dado que venha do banco de dados'
+    fs.writeFile('Umarquivo!.txt', textFromDatabase, (err) => {if(err) throw err})
+  })
 
   /* Na forma errada, o arquivo pode não ter sido criado quando a função appendFile é chamada, e assim, geraria um erro. O correto é manipular o arquivo
    * dentro da callback da função. 
@@ -144,10 +147,10 @@ const callbackFileSystem = async () => {
    
   /* Para criar diretórios não existem muitos mistérios também */ 
 
-  // fs.mkdir('src/MeuDiretório', 0777 & (~process.umask()), (err) => {
-  //   if(err) throw err
-  //   /* diiretório criado */
-  // })
+  fs.mkdir('src/MeuDiretório', 0777 & (~process.umask()), (err) => {
+    if(err) throw err
+    /* diiretório criado */
+  })
 
   /* Basicamente, você chama a função fs.mkdir. Onde o primeiro argumento é onde o diretório será alocado assim como nas funções supracitadas. O segundo argumento
    * por sua vez são as permissões do diretório e não é necessário especificá-lo, por padrão é "0777 & (~process.umask())", eu o coloquei ali para vocẽ saber que pode 
@@ -160,7 +163,7 @@ const callbackFileSystem = async () => {
 
   /* Para apagar um diretório */ 
 
-   //fs.rmdir('src/src2', { recursive: true }, (err) => { if (err) throw err; });
+   fs.rmdir('src/src2', { recursive: true }, (err) => { if (err) throw err; });
 
   /* A função rmdir deleta um diretório, o primeiro argumento é o caminho. O segundo argumento,  { recursive: true }, serve para evitar erros, pois, se o diretório 
    * já existir e tiver outros arquivos dentro é lançado uma exceção no sistema que diz que o diretório já existe e não é vazio, 
@@ -170,7 +173,7 @@ const callbackFileSystem = async () => {
 
   /* Limpando arquivos. Lendo os conteúdos de um diretório e entendendo arquivos */
 
-   //fs.truncate('Umarquivo!.txt', 100, (err) => {if(err) throw err})
+   fs.truncate('Umarquivo!.txt', 100, (err) => {if(err) throw err})
 
  /* A função truncate altera o tamanho de um arquivo, e às vezes você pode querer diminuir ou aumentarr o tamanho dele. O segundo 
   * argumento nesse caso, é o tamanho desejado. No nosso caso é 0, ou seja, arquivo é limpo. Caso esse tamanho seja maior
@@ -179,18 +182,18 @@ const callbackFileSystem = async () => {
   * Exemplo de uso com mais funções interessantes: 
   */
 
-//  const cleanDirectory = (pathToDir) => 
-//    fs.readdir(pathToDir, (err, files) => { 
-//      if(err) throw err
-//       files.forEach(file => {
-//         const pathToFile = `${pathToDir}/${file}`
-//         fs.statSync(pathToFile).isFile() ? 
-//         fs.truncate(pathToFile, 0, (err) => {if(err) throw err}) : 
-//         cleanDirectory(pathToFile)
-//         })
-//     })
+ const cleanDirectory = (pathToDir) => 
+   fs.readdir(pathToDir, (err, files) => { 
+     if(err) throw err
+      files.forEach(file => {
+        const pathToFile = `${pathToDir}/${file}`
+        fs.statSync(pathToFile).isFile() ? 
+        fs.truncate(pathToFile, 0, (err) => {if(err) throw err}) : 
+        cleanDirectory(pathToFile)
+        })
+    })
     
-//   fs.mkdir('src', (err) => {if(err) cleanDirectory('src')})
+  fs.mkdir('src', (err) => {if(err) cleanDirectory('src')})
 
     /* Entendendo e explicando um pouco do que está acontecendo. Eu criei uma função que chama cleanDirectory, a idéia é que ela apague os dados de dentro dos files 
      * dentro de um folder, e dos folderes que existirem dentro dela. Ela recebe como parẫmetro o caminho para o diretório a ser limpado. Em sequência, 
@@ -215,10 +218,10 @@ const callbackFileSystem = async () => {
      * será "<Buffer aa bb 21 c5 ...>", onde cada número é um valor que vai de 0 a F, hexadecimal. Isso é importante por que muitas vezes podemos receber erros
      * referentes á isso. No seguinte exemplo, vou ler um arquivo com a string "teste", e fazer um log do mesmo 
      */
-    // fs.readFile('Umarquivo!.txt', (err, data) => {
-    //   if(err) throw err
-    //   console.log(data) // <Buffer 74 65 73 74 65>
-    // })
+    fs.readFile('Umarquivo!.txt', (err, data) => {
+      if(err) throw err
+      console.log(data) // <Buffer 74 65 73 74 65>
+    })
     /* O valor na frente do console é referente ao log do console. A ideia é que o fs leu, char por char, em hexadecimal. Agora, vamos supor que você
      * queira mudar isso. Existem diferentes tipo de codificação aceitos pelo readFile, e eles entram como segundo argumento nessa brincadeira. O tipo
      * mais comum para strings e dados que nós manipulamos é utf-8. UTF-8 é a abreviação Universal Coded Character Set - Transformation Format – 8-bit.
@@ -226,10 +229,10 @@ const callbackFileSystem = async () => {
      * UTF8 como parãmetro, então o valor que consta nesse arquivo será "teste", pois ele lerá como se fosse uma string tradicional da forma como estamos
      * acostumados a lidar.
      */
-    // fs.readFile('Umarquivo!.txt', 'utf8', (err, data) => {
-    //   if(err) throw err
-    //   console.log(data) // teste
-    // })
+    fs.readFile('Umarquivo!.txt', 'utf8', (err, data) => {
+      if(err) throw err
+      console.log(data) // teste
+    })
     /* No exemplo de cima eu coloquei o encoding como sendo 'utf-8' então o dado será lido como sendo a string salva no arquivo. Existem diferentes
      * tipos de encoding, como por exemplo base64, hex, binary. Para dados de imagem é comum usar base64, binary para representação de bits e por ai vai.
      * O tipo de dado 'hex' retorna uma string com os valores hexadeciamsi, então no primeiro exemplo ao inves de recebermos <Buffer 74 65 73 74 65>, por padrão,
@@ -242,9 +245,9 @@ const callbackFileSystem = async () => {
     /* Renomeando arquivos e movendo arquivos*/ 
 
     /* Podemos alterar o nome, tanto de arquivos, quanto de diretórios, e a ideia é a mesma de todas as funções anteriores. */
-    // fs.rename('Umarquivo!.txt', 'src/Outroarquivo!.txt', (err) => {
-    //   if(err) throw err
-    // })
+    fs.rename('Umarquivo!.txt', 'src/Outroarquivo!.txt', (err) => {
+      if(err) throw err
+    })
     /* Na função acima, o primeiro argumento é o caminho para o arquivo/diretório antigo e o segundo é o novo nome, podemos passar também um novo caminho
      * e assim, movê-los de lugar.  
      */
@@ -254,32 +257,32 @@ const callbackFileSystem = async () => {
     /* A biblioca nos permite monitorar se arquivos foram alterados, apagados ou se ocorreu um erro neles.
      * A ideia é que seja adicionado um event listener em um arquivo para monitorar alterações feitas nele. */
     
-    // const watcher = fs.watch('src', 'utf-8')
-    // watcher.on('change', (event, fileName) => {
-    //   console.log(`O arquivo ${fileName} sofreu um evento: ${event}`)
-    // })
+    const watcher = fs.watch('src', 'utf-8')
+    watcher.on('change', (event, fileName) => {
+      console.log(`O arquivo ${fileName} sofreu um evento: ${event}`)
+    })
     /* A const watch é um FSWatcher que monitora alterações feitas em nos arquivos de um diretório, assim, podemos usar como um event listener
      * watcher.on(eventName, nome do arquivo) o watcher pode monitorar por mudanças com 'change', mudanças de nome com 'rename' ou erros com 'error'
      */
 
     /* Copiando arquivos e diretórios */
 
-    // fs.copyFile('Novoarquivo.txt', 'src/aaa.txt', (err) => {
-    //   if(err) throw err
-    //   console.log('o arquivo foi copiado para "src/aaa.txt"')
-    // })
+    fs.copyFile('Novoarquivo.txt', 'src/aaa.txt', (err) => {
+      if(err) throw err
+      console.log('o arquivo foi copiado para "src/aaa.txt"')
+    })
     /* A ideia segue a de todos as funções citadas, recebemos dois paths e a função de callback. Um ponto importante é que, se o caminho
      * para onde o arquivo está sendo copiado já exista, os dados nele serão sobreescritos, por isso podemos usar a função acess que retorna 
      * se o arquivo em questão existe ou não 
      */
 
-    // fs.access('src/aaa.txt', (err) => {
-    //   if(!err) {console.log('O arquivo existe'); return}
-    //   fs.copyFile('Novoarquivo.txt', 'src/aaa.txt', (err) => {
-    //     if(err) throw err
-    //     console.log('o arquivo foi copiado para "src/aaa.txt"')
-    //   })
-    // })
+    fs.access('src/aaa.txt', (err) => {
+      if(!err) {console.log('O arquivo existe'); return}
+      fs.copyFile('Novoarquivo.txt', 'src/aaa.txt', (err) => {
+        if(err) throw err
+        console.log('o arquivo foi copiado para "src/aaa.txt"')
+      })
+    })
 
     /* A função acess retorna erro "null" caso o arquivo exista, então o que podemos fazer é retornar da função caso o mesmo não exista, pois
      * assim, evitamos a sobreescrita de arquivos.
@@ -287,7 +290,7 @@ const callbackFileSystem = async () => {
 
     /* Deletando arquivos */
     /* A função de deletar arquivos é chamada unlink, a forma de funcionamento segue a de todos os outros do sistema,*/
-    //fs.unlink('Novoarquivo.txt', (err)=> {if(err) throw err})
+    fs.unlink('Novoarquivo.txt', (err)=> {if(err) throw err})
 }
 
 /* Outras maneiras de se lidar com a biblioteca FS. 
@@ -338,7 +341,7 @@ const syncFileSystem = () => {
 }
 
 
-// promises()
-// callbackFileSystem()
-// asyncAwaitFileSystem()
-// syncFileSystem()
+promises()
+callbackFileSystem()
+asyncAwaitFileSystem()
+syncFileSystem()
